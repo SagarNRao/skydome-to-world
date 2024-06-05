@@ -18,11 +18,12 @@ with open("objects.json", 'r') as f:
             headers=headers,
         )
         
-        
         response_dict = response.json()
         
         for obj in data:
-            data[obj]["model_urls"] = response_dict["result"]["model_urls"]["glb"]
+            data[obj]["model_urls"] = response_dict["model_urls"]["glb"]
 
+with open ("objects.json", 'w') as f:
+    json.dump(data, f, indent=4)
 print("Data:")
 print(data)

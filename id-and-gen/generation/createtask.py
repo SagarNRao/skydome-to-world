@@ -6,7 +6,6 @@ import aiohttp
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-tasks = {}
 objects = []
 with open("objects.json",'r') as f:
     data = json.load(f)
@@ -18,7 +17,7 @@ YOUR_API_KEY="msy_rcp6SIBA2Saqkket6IQBDLklfyfT27EgHxiH"
 async def send_request(session, thing):
     payload = {
         "mode": "preview",
-        "prompt": thing,
+        "prompt": f"{thing}",
         "art_style": "realistic",
         "negative_prompt": "low quality, low resolution, low poly, ugly"
     }
@@ -31,17 +30,18 @@ async def send_request(session, thing):
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        tasks = []
-        for thing in objects:
-            tasks.append(send_request(session, thing))
-        return await asyncio.gather(*tasks)
-        
-        
-# Run the main function
+        tasks = [send_request(session, thing) for thing in objects]
+        responses = await asyncio.gather(*tasks)
+    return responses
+
 try:
     response = asyncio.run(main())
-except:
+except Exception as e:
+    print(f"An error occurred: {e}")
     response = []
+    
+# print("Responses:")
+# print(response)
 
 tasks = {obj: res["result"] for obj, res in zip(objects, response)}
     
